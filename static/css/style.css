@@ -5,19 +5,32 @@ h4 {
 
 p {
     margin-left: 20px;
+    padding: 20px;
+
 }
 
 form {
-    background-color: red;
+    background-color: lightblue;
     margin: 20px;
     padding: 20px
 }
 
 .my-k-w-h {
-    background-color: red;
-    color: white
+    width: 50%;
+    height: 700px
 }
 
-div {
-    color: red
+.my-text {
+    font-size: 20px;
+    font-weight: bold
+}
+
+a {
+    color: black;
+    background-color: black
+
+}
+
+img {
+    padding-left: 30%
 }
