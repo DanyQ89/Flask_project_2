@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% extends 'base.html' %}
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% block content%}
+    <h1>Размещение по каютам</h1>
+    {%set k = 'Каюта №'%}
+    {% for i in arr %}
+    <p>{{i}} - {{k}} {{loop.index}}{{' - капитан корабля' if not loop.index0 else ''}} </p>
+    {% endfor %}
+    {% endblock %}
+</body>
+</html>

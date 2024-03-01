@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+{% if el == 'ul' %}
+    <ul>
+        {% for item in arr%}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+{% elif el == 'ol' %}
+    <ol>
+        {% for item in arr%}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ol>
+{% else %}
+<h1>Неправильное название листа</h1>
+{% endif %}
+</body>
+</html>

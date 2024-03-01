@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% extends "base.html" %}
+
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <main>
+        {% block content %}
+
+            <h2 style="text-align: left">{{ text }}</h2>
+            <!---->
+            <img src="../static/img/spaceship.jpg" width="700" height="700" usemap="#image-map">
+            <map name="image-map">
+                <area shape="poly" coords="0, 0, 500, 0, 500, 500, 0, 500" alt="adsadasd" href="html.com">
+                {% if text == 'Научные симуляторы' %}
+                <div class="highlight"
+                     style="position: absolute; left: 880px; top: 500px; width: 20px; height: 20px; background-color: red"></div>
+                {% else %}
+                <div class="highlight"
+                     style="position: absolute; left: 850px; top: 500px; width: 20px; height: 20px; background-color: red"></div>
+                {% endif %}
+        <!--</map>-->
+        {% endblock %}
+    </main>
+</body>
+</html>
