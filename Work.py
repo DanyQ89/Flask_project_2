@@ -1,12 +1,12 @@
 import json
 from random import randint
 
-from Forms import LoginForm
 from flask import Flask, render_template, redirect, request
+
+from Forms import LoginForm
 from data import db_session
-from data.users import User
-# from data.news import News
 from data.jobs import Jobs
+from data.users import User
 from forms.user import RegisterForm
 
 app = Flask(__name__)
@@ -19,6 +19,8 @@ db_session.global_init('./db/mars_explorer.sqlite')
 #     json.dump(d, file, ensure_ascii=False, indent=4)
 
 users_array = []
+
+
 @app.route("/")
 def index0():
     db_sess = db_session.create_session()
@@ -40,8 +42,8 @@ def index(title):
 
 @app.route('/training/<profession>')
 def training(profession):
-    arr = ['инженер', 'строитель']
-    if any([i in profession.lower() for i in arr]):
+    arr_tr = ['инженер', 'строитель']
+    if any([i in profession.lower() for i in arr_tr]):
         heading = 'Инженерные тренажеры'
     else:
         heading = 'Научные симуляторы'
@@ -88,8 +90,8 @@ def success():
 
 @app.route('/distribution')
 def distribution():
-    arr = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
-    return render_template('distr.html', arr=arr)
+    arr_distr = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth']
+    return render_template('distr.html', arr=arr_distr)
 
 
 @app.route('/table_param/<sex>/<int:age>')
@@ -134,6 +136,7 @@ def gallery():
         arr.append(file.filename)
     return render_template('carousel.html', arr=arr)
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
     form = RegisterForm()
@@ -142,7 +145,7 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
-        # db_sess = db_session.create_session()
+        db_sess = db_session.create_session()
         if db_sess.query(User).filter(form.email.data == User.email).first():
             return render_template('register.html', title='Регистрация',
                                    form=form,
@@ -150,9 +153,14 @@ def reqister():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            about=form.about.data
+            surname=form.surname.data,
+            age=form.age.data,
+            position=form.position.data,
+            speciality=form.position.data,
+            address=form.address.data,
+            hashed_password=form.password.data
         )
-        user.set_password(form.password.data)
+        # user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
         return redirect('/login')
