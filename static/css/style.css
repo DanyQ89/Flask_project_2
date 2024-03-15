@@ -11,13 +11,18 @@ p {
 
 form {
     background-color: lightblue;
-    margin: 20px;
-    padding: 20px
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 5px;
+    max-width: 800px;
+
+    padding: 10px;
+
 }
 
-.my-k-w-h {
-    width: 50%;
-    height: 700px
+form h1 {
+    text-align: center;
+    color: black
 }
 
 .my-text {
@@ -35,6 +40,7 @@ img {
     padding-left: 30%
 }
 
-.h-el {
-    display: inline
+.header-main {
+    font-size: 3rem
+
 }

@@ -1,14 +1,14 @@
 import json
 from random import randint
 
-from flask import Flask, render_template, redirect, request, make_response, session
+from flask import Flask, render_template, redirect, request, make_response, session, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 # from Forms import LoginForm
 from data import db_session
 from data.jobs import Jobs
 from data.users import User
-from forms.user import RegisterForm, LoginForm
+from forms.user import RegisterForm, LoginForm, JobAdd
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -80,7 +80,7 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
-
+        print(form.password.data, user.hashed_password)
         if user and form.password.data == user.hashed_password:
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
@@ -169,14 +169,15 @@ def reqister():
             surname=form.surname.data,
             age=form.age.data,
             position=form.position.data,
-            speciality=form.position.data,
+            speciality=form.speciality.data,
             address=form.address.data,
             hashed_password=form.password.data
         )
         # user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/login')
+        login_user(user, remember=True)
+        return redirect('/')
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -208,6 +209,72 @@ def session_test():
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
+
+
+@app.route('/add_job', methods=['GET', 'POST'])
+def add_job():
+    form = JobAdd()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        if db_sess.query(Jobs).filter(form.title.data == Jobs.job).first():
+            render_template('add_job.html', form=form, message='Такая работа уже существует')
+        job = Jobs(
+            team_leader=form.leader_id.data,
+            job=form.title.data,
+            work_size=form.work_size.data,
+            collaborators=form.collaborators.data,
+            is_finished=form.is_finished.data
+        )
+        db_sess.add(job)
+        db_sess.commit()
+        return redirect('/')
+    # print(form.cs)
+    return render_template('add_job.html', form=form)
+
+
+@app.route('/edit_job/<int:id_job>', methods=['GET', 'POST'])
+@login_required
+def edit_job(id_job):
+    form = JobAdd()
+    if request.method == 'GET':
+        db_sess = db_session.create_session()
+        job = db_sess.query(Jobs).filter(Jobs.id == id_job).first()
+        if job and current_user.id in [1, form.leader_id.data]:
+            form.title.data = job.job
+            form.leader_id.data = job.team_leader
+            form.work_size.data = job.work_size
+            form.collaborators.data = job.collaborators
+            form.is_finished.data = job.is_finished
+
+        else:
+            abort(404)
+
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        job = db_sess.query(Jobs).filter(Jobs.id == id_job).first()
+        if job.job == form.title.data:
+            job.team_leader = form.leader_id.data
+            job.work_size = form.work_size.data
+            job.collaborators = form.collaborators.data
+            job.is_finished = form.is_finished.data
+            db_sess.commit()
+            return redirect('/')
+        return render_template('add_job.html', form=form, message='Название работы не должно изменяться')
+
+    return render_template('add_job.html', form=form)
+
+
+@app.route('/delete_job/<int:job_id>', methods=['GET', 'POST'])
+@login_required
+def delete_job(job_id):
+    db_sess = db_session.create_session()
+    job = db_sess.query(Jobs).filter(Jobs.id == job_id).first()
+    if job and current_user.id in [1, job.team_leader]:
+        db_sess.delete(job)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/')
 
 
 if __name__ == '__main__':

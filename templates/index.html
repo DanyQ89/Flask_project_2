@@ -10,57 +10,63 @@
     <title>Title</title>
 </head>
 <body>
+{% block content %}
+<h1 style="text-align: center">Works log</h1>
+<a class="btn btn-secondary col-2" style="margin-left: 1rem" href="/add_job">Добавить работу</a>
+{% for user in users %}
+<p>Action # {{loop.index}}</p>
+<div class="container max-width">
+    <div class="row ">
+        <div class="col">
+            Title of activity
+        </div>
+        <div class="col">
+            Team leader
+        </div>
+        <div class="col">
+            Duration
+        </div>
+        <div class="col">
+            Colls
+        </div>
+        <div class="col">
+            Finished
+        </div>
 
-    {% block content %}
-        <h1 style="text-align: center">Works log</h1>
-        {% for user in users %}
-            <p>Action # {{loop.index}}</p>
-            <div class="container max-width">
-                <div class="row">
-                    <div class="col">
-                        Title of activity
-                    </div>
-                    <div class="col">
-                        Team leader
-                    </div>
-                    <div class="col">
-                        Duration
-                    </div>
-                    <div class="col">
-                        Colls
-                    </div>
-                    <div class="col">
-                        Finished
-                    </div>
+    </div>
 
-                </div>
+    <div class="row">
+        <div class="col">
+            {{ user[1].job }}
+        </div>
+        <div class="col">
+            {{ leaders[loop.index0] }}
+        </div>
+        <div class="col">
+            {{ user[1].work_size}} hours
+        </div>
+        <div class="col">
+            {{ user[1].collaborators }}
+        </div>
+        <div class="col">
+            {% if user[1].is_finished == False %}
+            NO
+            {% else %}
+            Yes
+            {% endif %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <a class="btn btn-warning col-2" href="edit_job/{{user[1].id}}">Редактировать</a>
+            <a class="btn btn-danger col-1" href="delete_job/{{user[1].id}}">Удалить</a>
+        </div>
 
-                <div class="row">
-                    <div class="col">
-                        {{ user[1].job }}
-                    </div>
-                    <div class="col">
-                        {{ leaders[loop.index0] }}
-                    </div>
-                    <div class="col">
-                        {{ user[1].work_size}} hours
-                    </div>
-                    <div class="col">
-                        {{ user[1].collaborators }}
-                    </div>
-                    <div class="col">
-                        {% if user[1].is_finished == False %}
-                            NO
-                        {% else %}
-                            Yes
-                        {% endif %}
-                    </div>
+    </div>
+</div>
 
-                </div>
-            </div>
-
-        {% endfor %}
-    {% endblock %}
+{% endfor %}
+{% endblock %}
 
 </body>
 </html>

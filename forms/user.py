@@ -25,8 +25,9 @@ class LoginForm(FlaskForm):
 
 
 class JobAdd(FlaskForm):
-    title = StringField('Название работы')
-    leader_id = IntegerField('ID капитана команды')
-    work_size = IntegerField('Количество работы в часах')
-    collaborators = StringField('ID работников')
+    title = StringField('Название работы', validators=[DataRequired()])
+    leader_id = IntegerField('ID капитана команды', validators=[DataRequired()])
+    work_size = IntegerField('Количество работы в часах', validators=[DataRequired()])
+    collaborators = StringField('ID работников', validators=[DataRequired()])
+    is_finished = BooleanField('Работа закончена?')
     submit = SubmitField('Добавить')
