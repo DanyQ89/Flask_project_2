@@ -7,9 +7,23 @@
     <title>{{ title }}</title>
 </head>
 <body>
-    <h1 class="text-dark bg-light">Миссия Колонизация Марса</h1>
-<!--    <h4 style="color: green" class="bg-light">И на Марсе будут яблони цвести!</h4>-->
-    <h4 >И на Марсе будут яблони цвести!</h4>
+<header>
+    <nav>
+        <div class="navbar navbar-light bg-light" >
+            <h1  style="">Миссия Колонизация Марса</h1>
+            {% if current_user.is_authenticated %}
+            <a  class="navbar-brand  bg-light" style="margin-right: 20px; font-size: 30px" href="/logout">{{ current_user.name }}</a>
+            {% else %}
+            <p>
+                <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
+                <a class="btn btn-success" href="/login">Войти</a>
+            </p>
+            {% endif %}
+        </div>
+        <h1 style="color: green; font-size:25px" class="bg-light">И на Марсе будут яблони цвести!</h1>
+    </nav>
+</header>
+<!--    <h4 >И на Марсе будут яблони цвести!</h4>-->
 <main role="main" class="container">
     {% block content %}
     {% endblock %}

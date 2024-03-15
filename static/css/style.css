@@ -34,3 +34,7 @@ a {
 img {
     padding-left: 30%
 }
+
+.h-el {
+    display: inline
+}

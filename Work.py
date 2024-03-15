@@ -1,24 +1,20 @@
 import json
 from random import randint
 
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, make_response, session
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
-from Forms import LoginForm
+# from Forms import LoginForm
 from data import db_session
 from data.jobs import Jobs
 from data.users import User
-from forms.user import RegisterForm
+from forms.user import RegisterForm, LoginForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-
 db_session.global_init('./db/mars_explorer.sqlite')
-
-# d = {'1': {'n_s': 'Энди Уир', 'prof': 'Астрогеолог'}, '2': {'n_s': 'Леша', 'prof': 'пчела'}}
-# with open('./templates/data.json', 'wt', encoding='utf8') as file:
-#     json.dump(d, file, ensure_ascii=False, indent=4)
-
-users_array = []
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
 @app.route("/")
@@ -30,7 +26,6 @@ def index0():
     for i in users:
         leader = db_sess.query(User).filter(User.id == i[1].team_leader).first()
         leaders.append(f'{leader.name} {leader.surname}')
-        print(users)
 
     return render_template("index.html", users=users, leaders=leaders)
 
@@ -66,21 +61,40 @@ def answer():
     return render_template('auto_answer.html', d=d, title=title)
 
 
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+@app.route('/login_old', methods=['GET', 'POST'], endpoint='login_old')
+def login_old():
+    form = LoginForm()
+    if form.validate_on_submit():
+        try:
+            f = form.data
+        except Exception:
+            pass
+        return redirect('/success')
+
+    return render_template('login_old.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        try:
-            f = form.data
-            print(f)
-        except Exception:
-            pass
-        return redirect('/success')
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
 
-    return render_template('login.html', form=form)
+        if user and form.password.data == user.hashed_password:
+            login_user(user, remember=form.remember_me.data)
+            return redirect("/")
+        return render_template('login.html',
+                               message="Неправильный логин или пароль",
+                               form=form)
+    return render_template('login.html', title='Авторизация', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
 
 
 @app.route('/success')
@@ -96,7 +110,6 @@ def distribution():
 
 @app.route('/table_param/<sex>/<int:age>')
 def table_param(sex, age):
-    print(sex, age)
     color = 'white'
     photo = '../../static/img/'
 
@@ -165,6 +178,36 @@ def reqister():
         db_sess.commit()
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
+
+
+@app.route("/cookie_test")
+def cookie_test():
+    visits_count = int(request.cookies.get("visits_count", 0))
+    if visits_count:
+        res = make_response(
+            f"Вы пришли на эту страницу {visits_count + 1} раз")
+        res.set_cookie("visits_count", str(visits_count + 1),
+                       max_age=60 * 60 * 24 * 365 * 2)
+    else:
+        res = make_response(
+            "Вы пришли на эту страницу в первый раз за последние 2 года")
+        res.set_cookie("visits_count", '1',
+                       max_age=60 * 60 * 24 * 365 * 2)
+    return res
+
+
+@app.route("/session_test")
+def session_test():
+    visits_count = session.get('visits_count', 0)
+    session['visits_count'] = visits_count + 1
+    return make_response(
+        f"Вы пришли на эту страницу {visits_count + 1} раз")
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    db_sess = db_session.create_session()
+    return db_sess.query(User).get(user_id)
 
 
 if __name__ == '__main__':
