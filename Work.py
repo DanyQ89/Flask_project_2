@@ -6,9 +6,10 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 
 # from Forms import LoginForm
 from data import db_session
+from data.departments import Department
 from data.jobs import Jobs
 from data.users import User
-from forms.user import RegisterForm, LoginForm, JobAdd
+from forms.user import RegisterForm, LoginForm, JobAdd, DepAdd
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -163,17 +164,17 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
-        user = User(
-            name=form.name.data,
-            email=form.email.data,
-            surname=form.surname.data,
-            age=form.age.data,
-            position=form.position.data,
-            speciality=form.speciality.data,
-            address=form.address.data,
-            hashed_password=form.password.data
-        )
-        # user.set_password(form.password.data)
+        user = User()
+
+        user.name = form.name.data
+        user.email = form.email.data
+        user.surname = form.surname.data
+        user.age = form.age.data
+        user.position = form.position.data
+        user.speciality = form.speciality.data
+        user.address = form.address.data
+        user.hashed_password = form.password.data
+
         db_sess.add(user)
         db_sess.commit()
         login_user(user, remember=True)
@@ -275,6 +276,75 @@ def delete_job(job_id):
     else:
         abort(404)
     return redirect('/')
+
+
+@app.route('/departments', methods=['GET', 'POST'])
+@login_required
+def departments():
+    db_sess = db_session.create_session()
+    dep = db_sess.query(User, Department).join(User, Department.chief == User.id).all()
+
+    return render_template('departments.html', deps=dep)
+
+
+@app.route('/add_dep', methods=['GET', 'POST'])
+@login_required
+def add_dep():
+    form = DepAdd()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+
+        if db_sess.query(Department).filter(form.email.data == Department.email).first():
+            return render_template('add_dep.html', form=form, message='Такой департамент уже существует')
+        dep = Department(
+            title=form.title.data,
+            chief=form.chief.data,
+            members=form.members.data,
+            email=form.email.data
+        )
+
+        db_sess.add(dep)
+        db_sess.commit()
+        return redirect('/departments')
+
+    return render_template('add_dep.html', form=form)
+
+
+@app.route('/edit_dep/<int:id_dep>', methods=['GET', 'POST'])
+@login_required
+def edit_dep(id_dep):
+    form = DepAdd()
+    if request.method == 'GET':
+        db_sess = db_session.create_session()
+        old_dep = db_sess.query(Department).filter(Department.id == id_dep).first()
+        if old_dep:
+            form.title.data = old_dep.title
+            form.chief.data = old_dep.chief
+            form.members.data = old_dep.members
+            form.email.data = old_dep.email
+
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        dep = db_sess.query(Department).filter(Department.id == id_dep).first()
+        if dep.title == form.title.data:
+            dep.chief = form.chief.data
+            dep.members = form.members.data
+            dep.email = form.email.data
+            db_sess.commit()
+            return redirect('/departments')
+        return render_template('add_dep.html', form=form, message='Название департамента не должно изменяться')
+
+    return render_template('add_dep.html', form=form)
+
+
+@app.route('/delete_dep/<int:dep_id>')
+@login_required
+def delete_dep(dep_id):
+    db_sess = db_session.create_session()
+    dep = db_sess.query(Department).filter(Department.id == dep_id).first()
+    db_sess.delete(dep)
+    db_sess.commit()
+    return redirect('/departments')
 
 
 if __name__ == '__main__':
