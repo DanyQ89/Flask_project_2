@@ -33,6 +33,9 @@
             Colls
         </div>
         <div class="col">
+            Hazard category
+        </div>
+        <div class="col">
             Finished
         </div>
 
@@ -50,6 +53,9 @@
         </div>
         <div class="col">
             {{ user[1].collaborators }}
+        </div>
+        <div class="col">
+            {{ user[1].hazard }}
         </div>
         <div class="col">
             {% if user[1].is_finished == False %}

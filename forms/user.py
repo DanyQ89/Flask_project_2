@@ -29,6 +29,7 @@ class JobAdd(FlaskForm):
     leader_id = IntegerField('ID капитана команды', validators=[DataRequired()])
     work_size = IntegerField('Количество работы в часах', validators=[DataRequired()])
     collaborators = StringField('ID работников', validators=[DataRequired()])
+    hazard = IntegerField('Категория опасности', validators=[DataRequired()])
     is_finished = BooleanField('Работа закончена?')
     submit = SubmitField('Добавить')
 

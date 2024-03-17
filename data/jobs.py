@@ -12,6 +12,7 @@ class Jobs(SqlAlchemyBase):
     job = Column(String)
     work_size = Column(Integer)
     collaborators = Column(String)
+    hazard = Column(Integer)
     start_date = Column(DateTime)
     end_date = Column(DateTime)
     is_finished = Column(Boolean)

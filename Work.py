@@ -22,6 +22,7 @@ login_manager.init_app(app)
 def index0():
     db_sess = db_session.create_session()
     users = db_sess.query(User, Jobs).join(User, Jobs.team_leader == User.id).all()
+    print(users)
     leaders = []
 
     for i in users:
@@ -224,6 +225,7 @@ def add_job():
             job=form.title.data,
             work_size=form.work_size.data,
             collaborators=form.collaborators.data,
+            hazard=form.hazard.data,
             is_finished=form.is_finished.data
         )
         db_sess.add(job)
@@ -245,8 +247,8 @@ def edit_job(id_job):
             form.leader_id.data = job.team_leader
             form.work_size.data = job.work_size
             form.collaborators.data = job.collaborators
+            form.hazard.data = job.hazard
             form.is_finished.data = job.is_finished
-
         else:
             abort(404)
 
@@ -257,6 +259,7 @@ def edit_job(id_job):
             job.team_leader = form.leader_id.data
             job.work_size = form.work_size.data
             job.collaborators = form.collaborators.data
+            job.hazard = form.hazard.data
             job.is_finished = form.is_finished.data
             db_sess.commit()
             return redirect('/')
