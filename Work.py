@@ -1,11 +1,11 @@
 import json
 from random import randint
 
-from flask import Flask, render_template, redirect, request, make_response, session, abort
+from flask import Flask, render_template, redirect, request, make_response, session, abort, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 # from Forms import LoginForm
-from data import db_session
+from data import db_session, jobs_api, users_api
 from data.departments import Department
 from data.jobs import Jobs
 from data.users import User
@@ -13,7 +13,6 @@ from forms.user import RegisterForm, LoginForm, JobAdd, DepAdd
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-db_session.global_init('./db/mars_explorer.sqlite')
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -350,5 +349,20 @@ def delete_dep(dep_id):
     return redirect('/departments')
 
 
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
+@app.errorhandler(400)
+def bad_request(_):
+    return make_response(jsonify({'error': 'Bad Request'}), 400)
+
+
 if __name__ == '__main__':
+    db_session.global_init('./db/mars_explorer.sqlite')
+    app.register_blueprint(jobs_api.blueprint)
+    app.register_blueprint(users_api.blueprint)
+    app.register_error_handler(400, bad_request)
+    app.register_error_handler(404, not_found)
     app.run(port=8888, host='127.0.0.1', debug=True)

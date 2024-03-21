@@ -1,12 +1,13 @@
 import datetime
-from sqlalchemy import Column, String, Integer, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from .db_session import SqlAlchemyBase
+
 from flask_login import UserMixin
+from sqlalchemy import Column, String, Integer, DateTime
+from sqlalchemy_serializer import SerializerMixin
+
+from .db_session import SqlAlchemyBase
 
 
-class User(SqlAlchemyBase, UserMixin):
+class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
