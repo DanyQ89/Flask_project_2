@@ -1,6 +1,10 @@
+import io
 import json
+import os
 from random import randint
 
+import requests
+from PIL import Image
 from flask import Flask, render_template, redirect, request, make_response, session, abort, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
@@ -357,6 +361,73 @@ def not_found(error):
 @app.errorhandler(400)
 def bad_request(_):
     return make_response(jsonify({'error': 'Bad Request'}), 400)
+
+
+@app.route('/users_show/<int:user_id>')
+def show_picture(user_id):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).get(user_id)
+    user_city = user.city_from
+    print(user.name, user.surname)
+    user_name_and_surname = f'{user.name} {user.surname}'
+    img = f'./static/img/img_of_{user_city}'
+    if not user_city:
+        user_city = 'world'
+    if not user or not user_city:
+        img = get_img('', True)
+    else:
+        img = get_img(user_city)
+
+    return render_template('show_city.html', path=img, name=user_name_and_surname, city=user_city)
+
+
+def get_img(name_func, world=False):
+    if world:
+        name_file = f'img_world'
+    else:
+        name_file = f'img_{name_func}'
+
+    path = f'./static/img/{name_file}.png'
+
+    if os.path.exists(path):
+        return path
+
+    api_key = '40d1649f-0493-4b70-98ba-98533de7710b'
+
+    if world:
+        coords = '28.97709,41.005233'
+        z = '1'
+    else:
+        url = 'http://geocode-maps.yandex.ru/1.x/'
+        params = {
+            'apikey': api_key,
+            'geocode': name_func,
+            'format': 'json'
+        }
+
+        res = requests.get(url, params=params).json()
+        print(res)
+        coord_1, coord_2 = [float(i) for i in
+                            res['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point'][
+                                'pos'].split()]
+
+        coords = f'{coord_1},{coord_2}'
+        z = '11'
+
+    url_map = 'https://static-maps.yandex.ru/1.x/'
+    params_map = {
+        'l': 'map',
+        'll': coords,
+        'z': z,
+        'size': f'650,450'
+    }
+    img = requests.get(url_map, params=params_map).content
+
+    image = Image.open(io.BytesIO(img))
+    # image = image.resize((650, 600))
+    image.save(path, 'PNG')
+
+    return path
 
 
 if __name__ == '__main__':

@@ -19,6 +19,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     address = Column(String)
     email = Column(String, unique=True)
     hashed_password = Column(String)
+    city_from = Column(String)
     modified_date = Column(DateTime, default=datetime.datetime.now)
 
     def __repr__(self):

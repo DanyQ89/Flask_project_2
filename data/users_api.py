@@ -10,6 +10,8 @@ blueprint = flask.Blueprint(
     template_folder='templates'
 )
 
+params = ['name', 'surname', 'age', 'position', 'speciality', 'address', 'email', 'hashed_password', 'city_from']
+
 
 @blueprint.route('/api/users', methods=['GET'])
 def get_all_users():
@@ -38,7 +40,6 @@ def get_one_user(user_id):
 
 @blueprint.route('/api/users', methods=['POST'])
 def add_user():
-    params = ['name', 'surname', 'age', 'position', 'speciality', 'address', 'email', 'hashed_password']
     if not request.json:
         return make_response(jsonify({'error': 'empty request'}), 400)
     elif not all(item in request.json for item in params):
@@ -54,6 +55,7 @@ def add_user():
         speciality=request.json['speciality'],
         address=request.json['address'],
         email=request.json['email'],
+        city_from=request.json['city_from'],
         hashed_password=request.json['hashed_password']
     )
 
@@ -66,8 +68,7 @@ def add_user():
 def edit_user(user_id):
     if not request.json:
         return make_response(jsonify({'error': 'Empty request'}), 400)
-    elif not all(key in request.json for key in
-                 ['name', 'surname', 'age', 'position', 'speciality', 'address', 'email', 'hashed_password']):
+    elif not all(key in request.json for key in params):
         return make_response(jsonify({'error': 'Bad request'}), 400)
 
     db_sess = db_session.create_session()
@@ -81,6 +82,7 @@ def edit_user(user_id):
     user.speciality = request.json['speciality']
     user.address = request.json['address']
     user.email = request.json['email']
+    user.city_from = request.json['city_from']
     user.hashed_password = request.json['hashed_password']
 
     db_sess.commit()
