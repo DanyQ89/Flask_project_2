@@ -13,6 +13,7 @@ from data.departments import Department
 from data.jobs import Jobs
 from data.users import User
 from data.users_resources import UsersResource, UsersListResource
+from data.jobs_resources import JobsResource, JobsListResource
 from flask_restful import reqparse, abort, Api, Resource
 from forms.user import RegisterForm, LoginForm, JobAdd, DepAdd
 
@@ -445,5 +446,8 @@ if __name__ == '__main__':
 
     api.add_resource(UsersResource, '/api/v2/user/<int:user_id>')
     api.add_resource(UsersListResource, '/api/v2/users')
+    api.add_resource(JobsResource, '/api/v2/job/<int:job_id>')
+    api.add_resource(JobsListResource, '/api/v2/jobs')
+
 
     app.run(port=8888, host='127.0.0.1', debug=True)
