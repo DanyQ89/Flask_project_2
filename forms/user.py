@@ -13,6 +13,7 @@ class RegisterForm(FlaskForm):
     position = StringField('Позиция', validators=[DataRequired()])
     speciality = StringField('Специальность', validators=[DataRequired()])
     address = StringField('Адрес', validators=[DataRequired()])
+    city_from = StringField('Город', validators=[DataRequired()])
 
     submit = SubmitField('Подтвердить')
 
