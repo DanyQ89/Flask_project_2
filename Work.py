@@ -8,14 +8,18 @@ from PIL import Image
 from flask import Flask, render_template, redirect, request, make_response, session, abort, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
-# from Forms import LoginForm
 from data import db_session, jobs_api, users_api
 from data.departments import Department
 from data.jobs import Jobs
 from data.users import User
+from data.users_resources import UsersResource, UsersListResource
+from flask_restful import reqparse, abort, Api, Resource
 from forms.user import RegisterForm, LoginForm, JobAdd, DepAdd
 
 app = Flask(__name__)
+api = Api(app)
+
+
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -25,7 +29,7 @@ login_manager.init_app(app)
 def index0():
     db_sess = db_session.create_session()
     users = db_sess.query(User, Jobs).join(User, Jobs.team_leader == User.id).all()
-    print(users)
+    # print(users)
     leaders = []
 
     for i in users:
@@ -85,7 +89,7 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
-        print(form.password.data, user.hashed_password)
+        # print(form.password.data, user.hashed_password)
         if user and form.password.data == user.hashed_password:
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
@@ -368,7 +372,7 @@ def show_picture(user_id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(user_id)
     user_city = user.city_from
-    print(user.name, user.surname)
+    # print(user.name, user.surname)
     user_name_and_surname = f'{user.name} {user.surname}'
     img = f'./static/img/img_of_{user_city}'
     if not user_city:
@@ -406,7 +410,7 @@ def get_img(name_func, world=False):
         }
 
         res = requests.get(url, params=params).json()
-        print(res)
+        # print(res)
         coord_1, coord_2 = [float(i) for i in
                             res['response']['GeoObjectCollection']['featureMember'][0]['GeoObject']['Point'][
                                 'pos'].split()]
@@ -432,8 +436,14 @@ def get_img(name_func, world=False):
 
 if __name__ == '__main__':
     db_session.global_init('./db/mars_explorer.sqlite')
+
     app.register_blueprint(jobs_api.blueprint)
     app.register_blueprint(users_api.blueprint)
+
     app.register_error_handler(400, bad_request)
     app.register_error_handler(404, not_found)
+
+    api.add_resource(UsersResource, '/api/v2/user/<int:user_id>')
+    api.add_resource(UsersListResource, '/api/v2/users')
+
     app.run(port=8888, host='127.0.0.1', debug=True)
