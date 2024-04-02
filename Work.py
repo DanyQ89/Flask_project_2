@@ -183,6 +183,7 @@ def reqister():
         user.speciality = form.speciality.data
         user.address = form.address.data
         user.hashed_password = form.password.data
+        user.city_from = form.city_from.data
 
         db_sess.add(user)
         db_sess.commit()
@@ -372,6 +373,10 @@ def bad_request(_):
 def show_picture(user_id):
     db_sess = db_session.create_session()
     user = db_sess.query(User).get(user_id)
+    if not user:
+        return jsonify(
+            {'error': f'user {user_id} not found'}
+        )
     user_city = user.city_from
     # print(user.name, user.surname)
     user_name_and_surname = f'{user.name} {user.surname}'
