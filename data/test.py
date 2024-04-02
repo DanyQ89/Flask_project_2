@@ -1,5 +1,8 @@
-url = 'http://localhost:8888/api/'
+# url = 'http://localhost:8888/api/'
+import pprint
 
+url_v2 = 'http://localhost:8888/api/v2/'
+from requests import get, post, put, delete
 # FOR JOBS
 
 # GET
@@ -87,3 +90,41 @@ url = 'http://localhost:8888/api/'
 
 
 # print(delete(url + 'users/8').json())
+
+
+
+#API №2
+
+
+# GET
+
+# print(get(url_v2 + 'users').json())
+
+# pprint.pprint(get(url_v2 + 'user/1').json())
+
+# pprint.pprint(get(url_v2 + 'user/13242').json())
+
+# pprint.pprint(get(url_v2 + 'user/asda').json())
+
+
+# POST
+
+# pprint.pprint(post(url_v2 + "users", json={
+#     'name': 'me',
+#     'surname': 'myself',
+#     'age': 16,
+#     'position': 'left-forward',
+#     'speciality': 'meow',
+#     'address': 'my address',
+#     'email': 'my_email@com',
+#     'hashed_password': '123',
+#     'city_from': 'Novosibirsk'
+#
+# }).json())
+
+# pprint.pprint(post(url_v2 + 'users', json={}).json())
+
+
+# DELETE
+
+# pprint.pprint(delete(url_v2 + "user/123").json())
