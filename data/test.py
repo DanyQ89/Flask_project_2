@@ -123,8 +123,18 @@ from requests import get, post, put, delete
 # }).json())
 
 # pprint.pprint(post(url_v2 + 'users', json={}).json())
+# pprint.pprint(post(url_v2 + 'jobs', json={}).json())
 
+# pprint.pprint(post(url_v2 + 'jobs', json={
+#     'job': 'middle_job',
+#     'team_leader': 4,
+#     'work_size': 247,
+#     'collaborators': '1, 2, 3',
+#     'hazard': 2,
+#     'is_finished': False
+# }).json())
 
 # DELETE
 
-# pprint.pprint(delete(url_v2 + "user/123").json())
+# pprint.pprint(delete(url_v2 + "job/8").json())
+
